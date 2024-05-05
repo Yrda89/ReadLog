@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailActivity">
+
+    <TextView
+        android:id="@+id/tvTituloApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="MI BIBLIOTECA"
+        android:textSize="30dp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@color/purple_app"
+        />
+
+    <ImageView
+        android:id="@+id/ivImagen"
+        android:layout_width="150dp"
+        android:layout_height="250dp"
+        android:background="@color/white"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:src="@drawable/readlog_big"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloApp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitulo"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+
+        android:text="Titulo: "
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloApp" />
+
+    <TextView
+        android:id="@+id/tvAutor"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textStyle="bold"
+        android:text="Autor: "
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintTop_toTopOf="@+id/tvTitulo" />
+
+    <TextView
+        android:id="@+id/tvCategoria"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textStyle="bold"
+        android:text="Categoria: "
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintTop_toTopOf="@+id/tvAutor" />
+
+    <TextView
+        android:id="@+id/tvEditorial"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textStyle="bold"
+        android:text="Editorial: "
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintTop_toTopOf="@+id/tvCategoria" />
+
+    <TextView
+        android:id="@+id/tvPuntuacion"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textStyle="bold"
+        android:text="Puntuacion: "
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintTop_toTopOf="@+id/tvEditorial" />
+
+    <TextView
+        android:id="@+id/tvResena"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="20dp"
+        android:text="Reseña: "
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/ivImagen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tvCampoResena"
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/style_borde_textview"
+        app:layout_constraintTop_toBottomOf="@+id/tvResena"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

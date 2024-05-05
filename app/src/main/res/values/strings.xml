@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ReadLog</string>
+    <string name="required">Requerido</string>
+    <string name="titulo">Título</string>
+    <string name="autor">Autor</string>
+    <string name="categoria">Categoría</string>
+    <string name="puntuacion">Puntuación</string>
+    <string name="imagen">Imagen</string>
+    <string name="editorial">Editorial</string>
+    <string name="paginas">Páginas</string>
+    <string name="resena">Reseña</string>
+    <string name="dialog_nuevo_libro">Añadir libro</string>
+</resources>
