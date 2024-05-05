@@ -21,7 +21,7 @@ class LibroAdapter(var libroList: List<Libro>,
     }
 
     override fun onBindViewHolder(holder: LibroViewHolder, position: Int){
-        holder.bind(libroList[position],navigateToDetailActivity)
+       // holder.bind(libroList[position],navigateToDetailActivity)
     }
 
     override fun getItemCount() = libroList.size
