@@ -3,13 +3,12 @@ package com.example.readlog
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import java.lang.reflect.Type
-import java.text.FieldPosition
+import com.example.readlog.database.entities.LibrosEntity
 
-class LibroAdapter(var libroList: List<Libro>,
-                   private val navigateToDetailActivity: (Int) -> Unit) : RecyclerView.Adapter<LibroViewHolder>(){
+class LibroAdapter(
+    var libroList: List<LibrosEntity> = emptyList()) : RecyclerView.Adapter<LibroViewHolder>(){
 
-    fun updateList(list: List<Libro>){
+    fun updateList(list: List<LibrosEntity>){
         libroList = list
         notifyDataSetChanged()
     }
@@ -21,7 +20,7 @@ class LibroAdapter(var libroList: List<Libro>,
     }
 
     override fun onBindViewHolder(holder: LibroViewHolder, position: Int){
-       // holder.bind(libroList[position],navigateToDetailActivity)
+        holder.bind(libroList[position])
     }
 
     override fun getItemCount() = libroList.size

@@ -2,22 +2,31 @@ package com.example.readlog.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.readlog.Libro
 
-@Entity(tableName = "libros_table")
+@Entity(tableName = "libros_table", foreignKeys = [ForeignKey(entity = CategoriasEntity::class, parentColumns = ["id_categoria"], childColumns = ["id_categoria"],
+    onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE, deferred = false)])
 data class LibrosEntity (
 
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id_libro") val id_libro: Int = 0,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id_Libro") val id_Libro: Int = 0,
     @ColumnInfo(name="titulo") val titulo : String,
     @ColumnInfo(name="autor") val autor : String,
-    @ColumnInfo(name="categoria") val categoria : String,
+    @ColumnInfo(name="id_categoria") val id_categoria : Int, // Clave foránea
     @ColumnInfo(name="editorial") val editorial : String,
-    @ColumnInfo(name="puntuacion") val puntuacion : Int,
     @ColumnInfo(name="paginas") val paginas : Int,
     @ColumnInfo(name="imagen") val imagen : String,
-    @ColumnInfo(name="resena") val resena : String
+
 )
 
-fun Libro.toDatabase() = LibrosEntity(titulo = titulo, autor = autor, categoria = categoria, editorial = editorial, puntuacion = puntuacion,
-                                        paginas = paginas, imagen = imagen, resena = resena)
+fun Libro.toDatabase(): LibrosEntity {
+    return LibrosEntity(
+        titulo = this.titulo,
+        autor = this.autor,
+        id_categoria = this.id_categoria,
+        editorial = this.editorial,
+        paginas = this.paginas,
+        imagen = this.imagen
+    )
+}

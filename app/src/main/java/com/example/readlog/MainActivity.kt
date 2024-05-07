@@ -3,21 +3,28 @@ package com.example.readlog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import com.example.readlog.database.LibrosDatabase
+import com.example.readlog.database.entities.toDatabase
 import com.example.readlog.databinding.ActivityMainBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         room = Room.databaseBuilder(this, LibrosDatabase::class.java, "libros").build()
         binding.searchView.setOnClickListener{}
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -45,24 +53,31 @@ class MainActivity : AppCompatActivity() {
         }
         initComponents()
         initListeners()
-       // initUI()
+        CoroutineScope(Dispatchers.IO).launch {
+            room.getCategoriaDao().llenarTablaCategorias()
+            room.getLibroDao().borrarLibros()
+        }
+        llenarBaseDeDatos()
         setUpAutoCompleteTextView()
+        initUI()
+
     }
 
-/*
-    private fun initUI(){
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener
-        {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                //searchByName(query)
-                return false
+
+    private fun initUI() {
+        binding.rvLibros.setHasFixedSize(true)
+        binding.rvLibros.layoutManager = LinearLayoutManager(this)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val listaLibros = room.getLibroDao().getAllLibros()
+            withContext(Dispatchers.Main) {
+                adapter = LibroAdapter(listaLibros)
+                binding.rvLibros.adapter = adapter
             }
-            override fun onQueryTextChange(newText: String?) = false
-        })
-
-
+        }
     }
-*/
+
+
 
     private fun initComponents() {
         addLibro = findViewById(R.id.addLibro)
@@ -79,10 +94,8 @@ class MainActivity : AppCompatActivity() {
         val titulo : EditText = dialog.findViewById(R.id.etTitulo)
         val autor : EditText = dialog.findViewById(R.id.etAutor)
         val editorial : EditText = dialog.findViewById(R.id.etEditorial)
-        val puntuacion : EditText = dialog.findViewById(R.id.etPuntuacion)
         val paginas : EditText = dialog.findViewById(R.id.etPaginas)
         val imagen : EditText = dialog.findViewById(R.id.etImagen)
-        val resena : String = ""
 
 
 
@@ -118,27 +131,43 @@ class MainActivity : AppCompatActivity() {
             showToast("Categoría seleccionada: $itemSelected")
         }
 
-        btnAddLibro.setOnClickListener {
-            val currentTitulo = titulo.text.toString()
-            val currentAutor = autor.text.toString()
-            val currentCategoria = autoCompleteCategoria.text.toString()
-            val currentEditorial = editorial.text.toString()
-            val currentPuntuacion = puntuacion.text.toString().toInt()
-            val currentPagina = paginas.text.toString().toInt()
-            val currentImagen = imagen.text.toString()
 
 
-            if(currentTitulo.isNotEmpty() && currentAutor.isNotEmpty()
-                && currentCategoria.isNotEmpty() && currentEditorial.isNotEmpty()){
-                Libro(currentTitulo,currentAutor,currentCategoria,currentEditorial,currentPuntuacion,currentPagina,currentImagen,resena)
-                // to do libro a bbdd
+
+            btnAddLibro.setOnClickListener {
+                val currentTitulo = titulo.text.toString()
+                val currentAutor = autor.text.toString()
+                val currentCategoria = autoCompleteCategoria.text.toString() // Asumiendo que aquí obtienes el nombre de la categoría seleccionada
+                val currentEditorial = editorial.text.toString()
+                val currentPagina = paginas.text.toString().toInt()
+                val currentImagen = imagen.text.toString()
+
+                if (currentTitulo.isNotEmpty() && currentAutor.isNotEmpty()
+                    && currentCategoria.isNotEmpty() && currentEditorial.isNotEmpty()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val categoria = room.getCategoriaDao().getCategoriaPorNombre(currentCategoria)
+                        categoria?.let {
+                            // Si se encontró la categoría, obtenemos su ID y añadimos el libro
+                            anadirLibro(Libro(currentTitulo, currentAutor, it.id_categoria, currentEditorial, currentPagina, currentImagen))
+                        } ?: run {
+                            // Si no se encontró la categoría, puedes mostrar un mensaje de error o manejarlo de otra manera
+                            // Por ejemplo:
+                            // showToast("La categoría seleccionada no existe")
+                        }
+                        Log.i(" ", room.getLibroDao().getAllLibros().toString())
+
+                    }
+                }
+
+
                 dialog.hide()
-            }
 
+            }
+        dialog.show()
         }
 
-        dialog.show()
-    }
+
+
 
 
     private fun setUpAutoCompleteTextView() {
@@ -173,4 +202,30 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun anadirLibro(libro: Libro){
+        CoroutineScope(Dispatchers.IO).launch {
+            room.getLibroDao().insertLibro(libro.toDatabase())
+        }
+    }
+
+    private fun llenarBaseDeDatos() {
+        val libros = listOf(
+            Libro("Título 1", "Autor 1", 1, "Editorial 1", 200, "imagen1.jpg"),
+            Libro("Título 2", "Autor 2", 2, "Editorial 2", 250, "imagen2.jpg"),
+            Libro("Título 3", "Autor 3", 1, "Editorial 1", 180, "imagen3.jpg"),
+            Libro("Título 4", "Autor 4", 3, "Editorial 3", 300, "imagen4.jpg"),
+            Libro("Título 5", "Autor 5", 2, "Editorial 2", 220, "imagen5.jpg"),
+            Libro("Título 6", "Autor 6", 1, "Editorial 6", 200, "imagen6.jpg"),
+            Libro("Título 7", "Autor 7", 2, "Editorial 7", 250, "imagen2.jpg"),
+            Libro("Título 8", "Autor 8", 1, "Editorial 8", 180, "imagen3.jpg"),
+            Libro("Título 9", "Autor 9", 3, "Editorial 9", 300, "imagen4.jpg"),
+            Libro("Título 10", "Autor 10", 2, "Editorial 10", 220, "imagen5.jpg")
+        )
+
+        CoroutineScope(Dispatchers.IO).launch {
+            libros.forEach { libro ->
+                room.getLibroDao().insertLibro(libro.toDatabase())
+            }
+        }
+    }
 }

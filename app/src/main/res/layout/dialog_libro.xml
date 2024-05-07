@@ -107,22 +107,6 @@
 
 
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/contenedorPuntuacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        >
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPuntuacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="1"
-            android:inputType="number"
-            android:hint="@string/puntuacion"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/contenedorPaginas"
