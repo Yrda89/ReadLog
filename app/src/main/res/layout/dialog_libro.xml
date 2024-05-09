@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
-    android:background="@color/white"
+    android:background="@color/fondo_app"
     android:orientation="vertical">
 
 
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:hint="Nuevo libro"
-        android:textColorHint="@color/purple_app"
+        android:textColorHint="@color/marron_letra_rv"
         android:textSize="24dp"
         android:textStyle="bold"
         android:textAlignment="center"/>
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:text="@string/dialog_nuevo_libro"
             android:textColor="@color/white"
-            android:backgroundTint="@color/purple_app"
+            android:backgroundTint="@color/marron_letra_rv"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="275dp"/>
 

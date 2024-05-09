@@ -3,16 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="150dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/purple_app">
+    android:background="@color/fondo_app">
 
     <ImageView
         android:id="@+id/ivImagen"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="@color/white"
+
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
-        android:src="@drawable/readlog_big"
+
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -23,7 +23,7 @@
         android:layout_marginTop="20dp"
         android:text="Titulo: "
         android:textStyle="bold"
-        android:textColor="@color/white"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +35,7 @@
         android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:text="Autor: "
-        android:textColor="@color/white"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvTitulo" />
@@ -47,7 +47,7 @@
         android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:text="Categoria: "
-        android:textColor="@color/white"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvAutor" />
@@ -59,21 +59,18 @@
         android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:text="Editorial: "
-        android:textColor="@color/white"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvCategoria" />
 
-    <TextView
-        android:id="@+id/tvPuntuacion"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textStyle="bold"
-        android:text="Puntuacion: "
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
-        app:layout_constraintTop_toTopOf="@+id/tvEditorial" />
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp"
+        app:dividerColor="@color/marron_letra_rv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

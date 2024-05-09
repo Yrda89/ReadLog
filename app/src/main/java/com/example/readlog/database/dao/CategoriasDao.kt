@@ -48,4 +48,10 @@ interface CategoriasDao {
 
     @Query("SELECT * FROM categorias_table WHERE categoria = :query")
     suspend fun getCategoriaPorNombre(query: String): CategoriasEntity?
+
+    @Query("SELECT * FROM categorias_table WHERE id_categoria = :query")
+    suspend fun getCategoriaPorId(query: Int): CategoriasEntity?
+
+    @Query("SELECT * FROM categorias_table")
+    suspend fun getAllCategorias(): List<CategoriasEntity>
 }

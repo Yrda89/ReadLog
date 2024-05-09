@@ -14,6 +14,8 @@ interface LibroDao {
     @Query("SELECT * FROM libros_table")
     suspend fun getAllLibros(): List<LibrosEntity>
 
+    @Query("SELECT id_Libro FROM libros_table")
+    suspend fun  getIdLibro(): List<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLibro(libro: LibrosEntity)
@@ -26,5 +28,8 @@ interface LibroDao {
 
     @Query("DELETE FROM libros_table")
     suspend fun borrarLibros()
+
+    @Query("DELETE FROM sqlite_sequence WHERE name LIKE 'libros_table'")
+    suspend fun borrarPrimaryKey()
 
 }

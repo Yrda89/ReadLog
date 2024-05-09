@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DetailActivity">
+    tools:context=".DetailActivity"
+    android:background="@color/fondo_app">
 
     <TextView
         android:id="@+id/tvTituloApp"
@@ -20,7 +21,7 @@
         android:textAlignment="center"
         android:textStyle="bold"
         android:textColor="@color/white"
-        android:background="@color/purple_app"
+        android:background="@color/marron_letra_rv"
         />
 
     <ImageView
@@ -38,11 +39,12 @@
         android:id="@+id/tvTitulo"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
 
         android:text="Titulo: "
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toBottomOf="@id/tvTituloApp" />
@@ -52,9 +54,10 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:text="Autor: "
-        android:textColor="@color/black"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvTitulo" />
@@ -64,9 +67,10 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:text="Categoria: "
-        android:textColor="@color/black"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvAutor" />
@@ -76,21 +80,23 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:text="Editorial: "
-        android:textColor="@color/black"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvCategoria" />
 
     <TextView
-        android:id="@+id/tvPuntuacion"
+        android:id="@+id/tvPaginas"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
         android:textStyle="bold"
-        android:text="Puntuacion: "
-        android:textColor="@color/black"
+        android:text="Paginas: "
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivImagen"
         app:layout_constraintTop_toTopOf="@+id/tvEditorial" />
@@ -103,7 +109,7 @@
         android:layout_marginTop="20dp"
         android:text="Reseña: "
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/marron_letra_rv"
         app:layout_constraintTop_toBottomOf="@+id/ivImagen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -112,7 +118,7 @@
     <TextView
         android:id="@+id/tvCampoResena"
         android:layout_width="350dp"
-        android:layout_height="250dp"
+        android:layout_height="200dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/style_borde_textview"
         app:layout_constraintTop_toBottomOf="@+id/tvResena"
@@ -120,10 +126,35 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <RatingBar
+        android:id="@+id/rbEstrellas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:progressTint="@color/estrellas"
+        android:rating="3"
+        android:stepSize="1"
         app:layout_constraintTop_toBottomOf="@id/tvCampoResena"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvMensajeEstrellas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="            "
+
+        app:layout_constraintTop_toBottomOf="@+id/rbEstrellas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/btnPuntuar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/marron_letra_rv"
+        android:text="Puntuar"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/tvMensajeEstrellas"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF1C1C</color>
     <color name="purple_app">#FFA97BFA</color>
+    <color name="marron_letra_rv">#914933</color>
+    <color name="fondo_app">#F0E7D7</color>
+    <color name="estrellas">#FF9800</color>
 </resources>
