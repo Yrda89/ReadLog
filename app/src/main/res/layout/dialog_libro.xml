@@ -113,6 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -130,6 +131,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        app:helperText="Dejar en blanco para poner la imagen por defecto"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -147,8 +149,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dialog_nuevo_libro"
+
             android:textColor="@color/white"
-            android:backgroundTint="@color/marron_letra_rv"
+            android:backgroundTint="@color/app_ui"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="275dp"/>
 

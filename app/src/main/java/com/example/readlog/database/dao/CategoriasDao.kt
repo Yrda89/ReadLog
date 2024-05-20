@@ -26,7 +26,7 @@ interface CategoriasDao {
                 "Ficción",
                 "No ficción",
                 "Misterio",
-                "Suspenso",
+                "Suspense",
                 "Ciencia ficción",
                 "Fantasía",
                 "Terror",
@@ -54,4 +54,6 @@ interface CategoriasDao {
 
     @Query("SELECT * FROM categorias_table")
     suspend fun getAllCategorias(): List<CategoriasEntity>
+
+
 }

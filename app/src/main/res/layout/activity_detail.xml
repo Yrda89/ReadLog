@@ -8,6 +8,39 @@
     tools:context=".DetailActivity"
     android:background="@color/fondo_app">
 
+    <LinearLayout
+        android:id="@+id/llBtn"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloApp"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/ivAtras"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/angulo_izquierdo"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/ivBasura"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="5dp"
+
+            android:src="@drawable/basura"/>
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/tvTituloApp"
         android:layout_width="match_parent"
@@ -21,45 +54,52 @@
         android:textAlignment="center"
         android:textStyle="bold"
         android:textColor="@color/white"
-        android:background="@color/marron_letra_rv"
+        android:background="@color/app_ui"
         />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvIvImagen"
+        android:layout_width="150dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintTop_toBottomOf="@id/llBtn"
+        app:layout_constraintStart_toStartOf="parent">
 
     <ImageView
         android:id="@+id/ivImagen"
-        android:layout_width="150dp"
-        android:layout_height="250dp"
-        android:background="@color/white"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:src="@drawable/readlog_big"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloApp"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/readlog_big" />
+
+</androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvTitulo"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
 
         android:text="Titulo: "
         android:textStyle="bold"
         android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloApp" />
+        app:layout_constraintStart_toEndOf="@+id/cvIvImagen"
+        app:layout_constraintTop_toBottomOf="@id/llBtn" />
 
     <TextView
         android:id="@+id/tvAutor"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:textStyle="bold"
         android:text="Autor: "
         android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintStart_toEndOf="@+id/cvIvImagen"
         app:layout_constraintTop_toTopOf="@+id/tvTitulo" />
 
     <TextView
@@ -67,12 +107,12 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:textStyle="bold"
         android:text="Categoria: "
         android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintStart_toEndOf="@+id/cvIvImagen"
         app:layout_constraintTop_toTopOf="@+id/tvAutor" />
 
     <TextView
@@ -80,12 +120,12 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:textStyle="bold"
         android:text="Editorial: "
         android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintStart_toEndOf="@+id/cvIvImagen"
         app:layout_constraintTop_toTopOf="@+id/tvCategoria" />
 
     <TextView
@@ -93,12 +133,12 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:textStyle="bold"
         android:text="Paginas: "
         android:textColor="@color/marron_letra_rv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivImagen"
+        app:layout_constraintStart_toEndOf="@+id/cvIvImagen"
         app:layout_constraintTop_toTopOf="@+id/tvEditorial" />
 
     <TextView
@@ -110,7 +150,7 @@
         android:text="Reseña: "
         android:textStyle="bold"
         android:textColor="@color/marron_letra_rv"
-        app:layout_constraintTop_toBottomOf="@+id/ivImagen"
+        app:layout_constraintTop_toBottomOf="@+id/cvIvImagen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -151,7 +191,7 @@
         android:id="@+id/btnPuntuar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/marron_letra_rv"
+        android:backgroundTint="@color/app_ui"
         android:text="Puntuar"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/tvMensajeEstrellas"
