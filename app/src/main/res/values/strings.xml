@@ -8,6 +8,7 @@
     <string name="imagen">Imagen</string>
     <string name="editorial">Editorial</string>
     <string name="paginas">Páginas</string>
+    <string name="paginasLeidas">Páginas leidas</string>
     <string name="resena">Reseña</string>
     <string name="dialog_nuevo_libro">Añadir libro</string>
 </resources>

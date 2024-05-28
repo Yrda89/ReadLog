@@ -16,6 +16,7 @@ data class LibrosEntity (
     @ColumnInfo(name="id_categoria") val id_categoria : Int, // Clave foránea
     @ColumnInfo(name="editorial") val editorial : String,
     @ColumnInfo(name="paginas") val paginas : Int,
+    @ColumnInfo(name="paginasLeidas") val paginasLeidas : Int,
     @ColumnInfo(name="imagen") val imagen : String,
 
 )
@@ -27,6 +28,7 @@ fun Libro.toDatabase(): LibrosEntity {
         id_categoria = this.id_categoria,
         editorial = this.editorial,
         paginas = this.paginas,
+        paginasLeidas = this.paginasLeidas,
         imagen = this.imagen
     )
 }

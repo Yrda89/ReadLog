@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        room = Room.databaseBuilder(this, LibrosDatabase::class.java, "libros").build()
+        room = Room.databaseBuilder(this, LibrosDatabase::class.java, "libros").fallbackToDestructiveMigration().build()
         binding.searchView.setOnClickListener {}
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         initComponents()
         initListeners()
 
-        llenarBaseDeDatos()
+        //llenarBaseDeDatos()
         setUpAutoCompleteTextView()
         initUI()
 
@@ -78,9 +78,8 @@ class MainActivity : AppCompatActivity() {
         })
         binding.rvLibros.setHasFixedSize(true)
         binding.rvLibros.layoutManager = LinearLayoutManager(this)
-        Log.i("antes corrutina", "  ")
         CoroutineScope(Dispatchers.IO).launch {
-            val listaLibros = room.getLibroDao().getAllLibros()
+            val listaLibros = room.getLibroDao().getLibrosOrdenTitulo()
             runOnUiThread() {
 
                 adapter = LibroAdapter(listaLibros) { idLibro ->
@@ -111,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         val autor: EditText = dialog.findViewById(R.id.etAutor)
         val editorial: EditText = dialog.findViewById(R.id.etEditorial)
         val paginas: EditText = dialog.findViewById(R.id.etPaginas)
+        val paginasLeidas: EditText = dialog.findViewById(R.id.etPaginasLeidas)
         val imagen: EditText = dialog.findViewById(R.id.etImagen)
 
         // Configurar AutoCompleteTextView para categorías en el diálogo
@@ -154,6 +154,7 @@ class MainActivity : AppCompatActivity() {
                 autoCompleteCategoria.text.toString() // Asumiendo que aquí obtienes el nombre de la categoría seleccionada
             val currentEditorial = editorial.text.toString()
             var currentPaginaInput = paginas.text.toString()
+            var currentPaginaLeidaInput = paginas.text.toString()
             var currentImagen = imagen.text.toString()
 
 
@@ -169,6 +170,16 @@ class MainActivity : AppCompatActivity() {
 
             // Verificar si el valor ingresado en el campo de páginas es numérico
             val currentPagina = if (currentPaginaInput.matches("\\d+".toRegex())) {
+                currentPaginaInput.toInt() // Convertir el valor a entero si es numérico
+            } else {
+                // Mostrar un mensaje de aviso al usuario si el valor no es numérico
+                showToast("El valor de páginas debe ser un número.")
+                // Establecer un valor predeterminado de 0
+                0
+            }
+
+            // Verificar si el valor ingresado en el campo de páginas es numérico
+            val currentPaginaLeida = if (currentPaginaLeidaInput.matches("\\d+".toRegex())) {
                 currentPaginaInput.toInt() // Convertir el valor a entero si es numérico
             } else {
                 // Mostrar un mensaje de aviso al usuario si el valor no es numérico
@@ -205,6 +216,7 @@ class MainActivity : AppCompatActivity() {
                                 it.id_categoria,
                                 currentEditorial,
                                 currentPagina,
+                                currentPaginaLeida,
                                 currentImagen
                             )
                         )
@@ -215,24 +227,15 @@ class MainActivity : AppCompatActivity() {
                     } ?: run {
 
                     }
-                    Log.i("antes de update ", room.getLibroDao().getAllLibros().toString())
-                    var listalib = room.getLibroDao().getAllLibros()
+                    var listalib = room.getLibroDao().getLibrosOrdenTitulo()
                     runOnUiThread() {
                         adapter.updateList(listalib)
-                        Log.i("update dentro", listalib.toString())
-
                     }
-                    Log.i("update fuera", room.getLibroDao().getAllLibros().toString())
                 }
             }
-
-
-            dialog.hide()
-
+           dialog.hide()
         }
-
         dialog.show()
-
     }
 
 
@@ -250,7 +253,7 @@ class MainActivity : AppCompatActivity() {
         autoCompleteTextView.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val itemSelected = items[position]
-                showToast("Item seleccionado: $itemSelected")
+                showToast("Ordenado por: $itemSelected")
 
                 // Según el ítem seleccionado, llamar al método correspondiente para ordenar y actualizar la lista
                 when (itemSelected) {
@@ -284,10 +287,8 @@ class MainActivity : AppCompatActivity() {
     private fun searchByName(query: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val listaLibros: List<LibrosEntity> = if (query.equals("*")) {
-                // Si la búsqueda está en blanco, obtener todos los libros
-                room.getLibroDao().getAllLibros()
+                room.getLibroDao().getLibrosOrdenTitulo()
             } else {
-                // De lo contrario, realizar la búsqueda por título
                 room.getLibroDao().getLibrosPorTitulo("%$query%")
             }
             Log.i("Cuerpo de la consulta2", listaLibros.toString())
@@ -301,84 +302,94 @@ class MainActivity : AppCompatActivity() {
     private fun llenarBaseDeDatos() {
         val libros = listOf(
             Libro(
-                "Título 1",
-                "Autor 1",
-                1,
-                "Editorial 1",
-                200,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+                "It",
+                "Stephen King",
+                7,
+                "Debols!llo",
+                1168,
+                915,
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/It_%281986%29_front_cover%2C_first_edition.jpg/800px-It_%281986%29_front_cover%2C_first_edition.jpg"
             ),
             Libro(
                 "Buscando a Alaska",
-                "Autor 2",
-                2,
-                "Editorial 2",
-                250,
+                "John Green",
+                15,
+                "Castillo",
+                320,
+                50,
                 "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1347234921i/15999454.jpg"
             ),
             Libro(
-                "Título 3",
-                "Autor 3",
-                1,
-                "Editorial 1",
-                180,
-                "https://www.superherodb.com/pictures2/portraits/10/100/10441.jpg"
-            ),
-            Libro(
-                "Título 4",
-                "Autor 4",
-                3,
-                "Editorial 3",
-                300,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
-            ),
-            Libro(
-                "Título 5",
-                "Autor 5",
-                2,
-                "Editorial 2",
-                220,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
-            ),
-            Libro(
-                "Título 6",
-                "Autor 6",
-                1,
-                "Editorial 6",
-                200,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
-            ),
-            Libro(
-                "Título 7",
-                "Autor 7",
-                2,
-                "Editorial 7",
+                "Elantris",
+                "Brandon Sanderson",
+                6,
+                "Nova",
+                638,
                 250,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+                "https://m.media-amazon.com/images/I/81XE08B76cL._AC_UF894,1000_QL80_.jpg"
             ),
             Libro(
-                "Título 8",
-                "Autor 8",
+                "Cuentos de navidad",
+                "Charles Dickens",
                 1,
-                "Editorial 8",
-                180,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+                "Alianza editorial",
+                214,
+                214,
+                "https://marcialpons.es/media/img/portadas/9788413629902.jpg"
             ),
             Libro(
-                "Título 9",
-                "Autor 9",
-                3,
-                "Editorial 9",
-                300,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+                "Fabricante de lágrimas",
+                "Erin Doom",
+                15,
+                "Montena",
+                640,
+                345,
+                "https://m.media-amazon.com/images/I/818dQkV5mrL._AC_UF1000,1000_QL80_.jpg"
+            ),
+            Libro(
+                "Alas de sangre",
+                "Rebecca Yarros",
+                6,
+                "Planeta",
+                706,
+                123,
+                "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1689055697i/187622892.jpg"
+            ),
+            Libro(
+                "Detrás del ruido",
+                "Ángel Martín",
+                10,
+                "Planeta",
+                256,
+                0,
+                "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1701611091i/198172802.jpg"
+            ),
+            Libro(
+                "Encuentra tu persona vitamina",
+                "Marian Rojas Estapé",
+                12,
+                "Planeta",
+                318,
+                231,
+                "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1628382196i/58722360.jpg"
+            ),
+            Libro(
+                "Hábitos atómicos",
+                "James Clear",
+                12,
+                "Planeta",
+                337,
+                222,
+                "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1555084828i/45028173.jpg"
             ),
             Libro(
                 "1984",
-                "Autor 10",
-                2,
-                "Editorial 10",
-                220,
-                "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+                "George Orwell",
+                1,
+                "Debols!llo",
+                368,
+                284,
+                "https://m.media-amazon.com/images/I/71sOSrd+JxL._AC_UF1000,1000_QL80_.jpg"
             )
         )
 
@@ -400,6 +411,7 @@ class MainActivity : AppCompatActivity() {
             val listaLibros =
                 room.getLibroDao().getLibrosOrdenTitulo() // Ordenar por defecto (título)
             runOnUiThread {
+                Log.i("lista ordenada tit", listaLibros.toString())
                 adapter.updateList(listaLibros)
             }
         }

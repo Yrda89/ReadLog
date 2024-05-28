@@ -64,4 +64,14 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.8")
 
     kapt ("androidx.room:room-compiler:2.6.1")
+
+    // Dagger Hilt
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
 }
+    kapt {   // Nuevo objeto creado bajo "dependencies"
+    correctErrorTypes = true  // Allow references to generated code
+}
+
+
+

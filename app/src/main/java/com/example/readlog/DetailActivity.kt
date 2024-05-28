@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
@@ -17,34 +19,48 @@ import androidx.room.Room
 import com.example.readlog.MainActivity.Companion.EXTRA_ID
 import com.example.readlog.database.LibrosDatabase
 import com.example.readlog.database.entities.LibrosEntity
+import com.example.readlog.database.entities.PuntuacionesEntity
+import com.example.readlog.database.entities.toDataBase
+import com.example.readlog.database.entities.toDatabase
 import com.example.readlog.databinding.ActivityDetailBinding
 import com.example.readlog.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Singleton
 
+@Singleton
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private lateinit var room: LibrosDatabase
+    private lateinit var tvCampoResena: TextView
+    private lateinit var rbEstrellas: RatingBar
+    private var id: Int = 0
+    private var contador_progreso: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         room = Room.databaseBuilder(this, LibrosDatabase::class.java, "libros").build()
+        tvCampoResena = findViewById(R.id.tvCampoResena)
         binding.ivBasura.setOnClickListener {
             showDeleteConfirmationDialog()
         }
+
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val id: Int = intent.extras?.getInt(EXTRA_ID)?:0
+        id = intent.extras?.getInt(EXTRA_ID)?:0
         Log.i("id pasado",id.toString())
         getLibro(id)
+        calcularProgreso()
     }
     private fun createUI(librosEntity: LibrosEntity){
         val ratingBar = findViewById<RatingBar>(R.id.rbEstrellas)
@@ -63,20 +79,118 @@ class DetailActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            val message = ratingBar.rating.toString()
-            Toast.makeText(this@DetailActivity, "La puntuacion es:"+ message, Toast.LENGTH_SHORT).show()
-        }
+            CoroutineScope(Dispatchers.IO).launch {
+                val rating = ratingBar.rating.toInt()
+                val existingPuntuacion = room.getPuntuacionesDao().getPuntuacionPorId(id)
+                if (existingPuntuacion == null) {
+                    anadirPuntuacion(Puntuacion(id, rating))
+                } else {
+                    actualizarPuntuacion(Puntuacion(id, rating))
+                }
+                withContext(Dispatchers.Main) {
+                    val message = rating
+                    Toast.makeText(
+                        this@DetailActivity,
+                        "La puntuacion es: " + message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    //binding.rbEstrellas.rating = ratingBar.rating
+                }
 
+
+            }
+        }
         binding.tvTitulo.text = "Título: "+librosEntity.titulo
         binding.tvAutor.text = "Autor: "+librosEntity.autor
         binding.tvEditorial.text = "Editorial: " + librosEntity.editorial
         binding.tvPaginas.text = "Páginas: " + librosEntity.paginas
-        //binding.rbEstrellas.numStars = 0
-        Picasso.get().load(librosEntity.imagen).into(binding.ivImagen)
+        binding.tvPaginasLeidas.text = "Páginas leidas: " + librosEntity.paginasLeidas
+
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val dao = room.getPuntuacionesDao()
+            dao.insertPuntuacionWithDefaultValues()
+            room.getResenasDao().insertResenaWithDefaultValues()
+
+            val categoria = room.getCategoriaDao().getCategoriaPorId(librosEntity.id_categoria)
+            val puntuacion = room.getPuntuacionesDao().getPuntuacionPorId(librosEntity.id_Libro)
+            val puntuacionFloat = puntuacion?.toFloat() ?: 0f
+            withContext(Dispatchers.Main) {
+                binding.rbEstrellas.rating = puntuacionFloat
+            }
+            val resena =
+                if(room.getResenasDao().getResenaPorId(librosEntity.id_Libro) != null){
+                    room.getResenasDao().getResenaPorId(librosEntity.id_Libro)
+            }else{
+                ""
+            }
+
+            withContext(Dispatchers.Main) {
+                binding.tvCampoResena.text = resena
+                binding.tvCategoria.text = "Categoría: " + (categoria)
+                binding.rbEstrellas.rating = puntuacion?.toFloat() ?: 0f
+            }
+        }
+
+        Picasso.get()
+            .load(librosEntity.imagen)
+            .placeholder(R.drawable.read_log_portada)
+            .error(R.drawable.read_log_portada)
+            .into(binding.ivImagen)
 
         binding.ivAtras.setOnClickListener { returnToMainActivity()}
-
+        binding.ivEditResena.setOnClickListener { showWriteReviewDialog() }
     }
+
+    private fun showWriteReviewDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_resena, null)
+        val dialogBuilder = AlertDialog.Builder(this)
+            .setView(dialogView)
+
+        val alertDialog = dialogBuilder.create()
+
+        val editTextReview = dialogView.findViewById<EditText>(R.id.etResena)
+        val buttonCancel = dialogView.findViewById<Button>(R.id.btnCancelar)
+        val buttonSubmit = dialogView.findViewById<Button>(R.id.btnEnviar)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val existingResena = room.getResenasDao().getResenaPorId(id)
+            withContext(Dispatchers.Main) {
+                if (existingResena != null) {
+                    editTextReview.setText(existingResena)
+                }
+            }
+        }
+
+        buttonCancel.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        buttonSubmit.setOnClickListener {
+            val reviewText = editTextReview.text.toString()
+            if (reviewText.isBlank()) {
+                Toast.makeText(this, "Por favor, escribe una reseña", Toast.LENGTH_SHORT).show()
+            } else {
+                val resena = Resena(id, reviewText)
+                CoroutineScope(Dispatchers.IO).launch {
+                    val existingResena = room.getResenasDao().getResenaPorId(id)
+                    if (existingResena == null) {
+                        anadirResena(resena)
+                    } else {
+                        actualizarResena(resena)
+                    }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@DetailActivity, "Reseña enviada: $reviewText", Toast.LENGTH_SHORT).show()
+                        binding.tvCampoResena.text = reviewText
+                    }
+                    alertDialog.dismiss()
+                }
+            }
+        }
+
+        alertDialog.show()
+    }
+
     @SuppressLint("SuspiciousIndentation")
     private fun getLibro(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -86,12 +200,10 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    // Método para volver a la actividad principal (MainActivity)
+
     private fun returnToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
-        finish()
     }
 
 
@@ -117,13 +229,85 @@ class DetailActivity : AppCompatActivity() {
     private fun deleteLibro(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             room.getLibroDao().borrarLibroPorId(id)
-            // Actualizar la interfaz de usuario después de borrar el libro
-            val listaLibros = room.getLibroDao().getAllLibros()
-        /*    runOnUiThread {
-                adapter.updateList(listaLibros)
-            }     */
         }
     }
 
+    private fun anadirPuntuacion(puntuacion: Puntuacion) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                room.getPuntuacionesDao().insertPuntuacion(puntuacion.toDataBase())
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DetailActivity, "Error al añadir puntuación", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun anadirResena(resena: Resena) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                room.getResenasDao().insertResena(resena.toDataBase())
+                withContext(Dispatchers.Main) {
+                    tvCampoResena.text = resena.resena
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DetailActivity, "Error al añadir reseña", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+
+    private fun actualizarResena(resena: Resena){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                room.getResenasDao().actualizarResena(resena.id_libro,resena.resena)
+                withContext(Dispatchers.Main) {
+                    tvCampoResena.text = resena.resena
+                    Log.i("resena actualizada", room.getResenasDao().getResenaPorId(id))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DetailActivity, "Error al actualizar reseña", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun actualizarPuntuacion(puntuacion: Puntuacion){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                room.getPuntuacionesDao().actualizarPuntuacion(puntuacion.id_libro,puntuacion.puntuacion)
+                withContext(Dispatchers.Main) {
+                    rbEstrellas.rating = puntuacion.puntuacion?.toFloat() ?: 0f
+                }
+            } catch (e: Exception) {
+                /*
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DetailActivity, "Error al actualizar puntuacion", Toast.LENGTH_SHORT).show()
+                }*/
+            }
+        }
+    }
+
+    private fun moverProgressBar(){
+        binding.progressBar.progress = contador_progreso
+        binding.tvTextProgreso.text = "$contador_progreso%"
+        Log.i("contador progreso", contador_progreso.toString())
+    }
+
+    private fun calcularProgreso(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val paginas = room.getLibroDao().getPaginasPorId(id)
+            val paginasLeidas = room.getLibroDao().getPaginasLeidasPorId(id)
+            contador_progreso = paginasLeidas * 100 / paginas
+            Log.i("contador progreso 2", contador_progreso.toString())
+            withContext(Dispatchers.Main) {
+                moverProgressBar()
+            }
+        }
+    }
 
 }

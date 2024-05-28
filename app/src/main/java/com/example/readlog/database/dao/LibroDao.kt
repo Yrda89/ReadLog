@@ -51,4 +51,9 @@ interface LibroDao {
     @Query("DELETE FROM libros_table where id_Libro like :id")
     suspend fun borrarLibroPorId(id: Int)
 
+    @Query("SELECT paginas from libros_table where id_Libro like :id")
+    suspend fun getPaginasPorId(id:Int): Int
+
+    @Query("SELECT paginasLeidas from libros_table where id_Libro like :id")
+    suspend fun getPaginasLeidasPorId(id:Int): Int
 }

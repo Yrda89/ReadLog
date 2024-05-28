@@ -6,6 +6,7 @@ data class Libro(
     val id_categoria : Int,
     val editorial : String,
     val paginas : Int,
+    val paginasLeidas : Int,
     val imagen : String,
 
 
