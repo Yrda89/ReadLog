@@ -13,7 +13,7 @@ data class LibrosEntity (
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id_Libro") val id_Libro: Int = 0,
     @ColumnInfo(name="titulo") val titulo : String,
     @ColumnInfo(name="autor") val autor : String,
-    @ColumnInfo(name="id_categoria") val id_categoria : Int, // Clave foránea
+    @ColumnInfo(name="id_categoria") val id_categoria : Int,
     @ColumnInfo(name="editorial") val editorial : String,
     @ColumnInfo(name="paginas") val paginas : Int,
     @ColumnInfo(name="paginasLeidas") val paginasLeidas : Int,

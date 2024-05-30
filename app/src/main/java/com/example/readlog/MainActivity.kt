@@ -59,6 +59,8 @@ class MainActivity : AppCompatActivity() {
         initComponents()
         initListeners()
 
+
+        //Para obtener datos de prueba descomentar llenarBaseDeDatos() y ejecutar la aplicación, despues cerrar la app y comentar de nuevo y volver a ejecutar
         //llenarBaseDeDatos()
         setUpAutoCompleteTextView()
         initUI()
@@ -113,11 +115,11 @@ class MainActivity : AppCompatActivity() {
         val paginasLeidas: EditText = dialog.findViewById(R.id.etPaginasLeidas)
         val imagen: EditText = dialog.findViewById(R.id.etImagen)
 
-        // Configurar AutoCompleteTextView para categorías en el diálogo
+
         val autoCompleteCategoria =
             dialog.findViewById<AutoCompleteTextView>(R.id.auto_complete_categoria)
 
-        // Lista de elementos para el AutoCompleteTextView
+
         val items = listOf(
             "Ficción",
             "No ficción",
@@ -136,11 +138,11 @@ class MainActivity : AppCompatActivity() {
             "Juvenil"
         )
 
-        // Configurar el adaptador
+
         val adapter2 = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, items)
         autoCompleteCategoria.setAdapter(adapter2)
 
-        // Manejar la selección de elementos
+
         autoCompleteCategoria.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val itemSelected = items[position]
@@ -151,51 +153,51 @@ class MainActivity : AppCompatActivity() {
             val currentTitulo = titulo.text.toString()
             val currentAutor = autor.text.toString()
             val currentCategoria =
-                autoCompleteCategoria.text.toString() // Asumiendo que aquí obtienes el nombre de la categoría seleccionada
+                autoCompleteCategoria.text.toString()
             val currentEditorial = editorial.text.toString()
             var currentPaginaInput = paginas.text.toString()
-            var currentPaginaLeidaInput = paginas.text.toString()
+            var currentPaginaLeidaInput = paginasLeidas.text.toString()
             var currentImagen = imagen.text.toString()
 
 
-            // Verificar si los campos requeridos están vacíos
+
             if (currentTitulo.isEmpty() || currentAutor.isEmpty()
                 || currentCategoria.isEmpty() || currentEditorial.isEmpty()
             ) {
-                // Mostrar un mensaje de aviso al usuario
+
                 showToast("Por favor, complete todos los campos requeridos.")
-                return@setOnClickListener // Salir de la función sin cerrar el diálogo
+                return@setOnClickListener
             }
 
 
-            // Verificar si el valor ingresado en el campo de páginas es numérico
+
             val currentPagina = if (currentPaginaInput.matches("\\d+".toRegex())) {
-                currentPaginaInput.toInt() // Convertir el valor a entero si es numérico
+                currentPaginaInput.toInt()
             } else {
-                // Mostrar un mensaje de aviso al usuario si el valor no es numérico
+
                 showToast("El valor de páginas debe ser un número.")
-                // Establecer un valor predeterminado de 0
+
                 0
             }
 
-            // Verificar si el valor ingresado en el campo de páginas es numérico
+
             val currentPaginaLeida = if (currentPaginaLeidaInput.matches("\\d+".toRegex())) {
-                currentPaginaInput.toInt() // Convertir el valor a entero si es numérico
+                currentPaginaLeidaInput.toInt()
             } else {
-                // Mostrar un mensaje de aviso al usuario si el valor no es numérico
+
                 showToast("El valor de páginas debe ser un número.")
-                // Establecer un valor predeterminado de 0
+
                 0
             }
 
-            // Verificar si la imagen está en blanco o vacía
+
             if (currentImagen.isBlank()) {
-                // Si la imagen está vacía, asignar una URL predeterminada
+
                 currentImagen = "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
             } else if (!currentImagen.startsWith("https://")) {
-                // Si la imagen no comienza con "https://", mostrar un mensaje de aviso
+
                 showToast("La URL de la imagen debe comenzar con 'https://'.")
-                return@setOnClickListener // Salir de la función sin cerrar el diálogo
+                return@setOnClickListener
             }
 
 
@@ -242,25 +244,25 @@ class MainActivity : AppCompatActivity() {
     private fun setUpAutoCompleteTextView() {
         autoCompleteTextView = findViewById(R.id.auto_complete)
 
-        // Lista de elementos para el AutoCompleteTextView
+
         val items = listOf("Título", "Autor", "Editorial", "Categoría")
 
-        // Configurar el adaptador
+
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, items)
         autoCompleteTextView.setAdapter(adapter)
 
-        // Manejar la selección de elementos
+
         autoCompleteTextView.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val itemSelected = items[position]
                 showToast("Ordenado por: $itemSelected")
 
-                // Según el ítem seleccionado, llamar al método correspondiente para ordenar y actualizar la lista
+
                 when (itemSelected) {
-                    "Título" -> searchByTitle() // Método para ordenar por título
-                    "Autor" -> searchByAuthor() // Método para ordenar por autor
-                    "Editorial" -> searchByEditorial() // Método para ordenar por editorial
-                    "Categoría" -> searchByCategory() // Método para ordenar por categoría
+                    "Título" -> searchByTitle()
+                    "Autor" -> searchByAuthor()
+                    "Editorial" -> searchByEditorial()
+                    "Categoría" -> searchByCategory()
                 }
             }
     }
@@ -409,7 +411,7 @@ class MainActivity : AppCompatActivity() {
     private fun searchByTitle() {
         CoroutineScope(Dispatchers.IO).launch {
             val listaLibros =
-                room.getLibroDao().getLibrosOrdenTitulo() // Ordenar por defecto (título)
+                room.getLibroDao().getLibrosOrdenTitulo()
             runOnUiThread {
                 Log.i("lista ordenada tit", listaLibros.toString())
                 adapter.updateList(listaLibros)

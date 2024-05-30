@@ -56,4 +56,8 @@ interface LibroDao {
 
     @Query("SELECT paginasLeidas from libros_table where id_Libro like :id")
     suspend fun getPaginasLeidasPorId(id:Int): Int
+
+    @Query("UPDATE libros_table SET titulo = :titulo, autor = :autor, id_categoria = :id_categoria,editorial = :editorial," +
+            " paginas = :paginas, paginasLeidas = :paginasLeidas, imagen = :imagen WHERE id_libro = :idLibro")
+    suspend fun actualizarLibro(idLibro: Int, titulo : String, autor : String, id_categoria : Int, editorial : String, paginas : Int, paginasLeidas : Int, imagen : String)
 }

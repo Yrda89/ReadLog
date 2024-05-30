@@ -11,4 +11,5 @@
     <string name="paginasLeidas">Páginas leidas</string>
     <string name="resena">Reseña</string>
     <string name="dialog_nuevo_libro">Añadir libro</string>
+    <string name="dialog_edit">Actualizar libro</string>
 </resources>

@@ -1,12 +1,18 @@
 package com.example.readlog
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
@@ -63,6 +69,7 @@ class DetailActivity : AppCompatActivity() {
         calcularProgreso()
     }
     private fun createUI(librosEntity: LibrosEntity){
+        val progressBar: ProgressBar = findViewById(R.id.progressBar)
         val ratingBar = findViewById<RatingBar>(R.id.rbEstrellas)
         val button = findViewById<Button>(R.id.btnPuntuar)
         val ratingScale = findViewById<TextView>(R.id.tvMensajeEstrellas)
@@ -94,7 +101,7 @@ class DetailActivity : AppCompatActivity() {
                         "La puntuacion es: " + message,
                         Toast.LENGTH_SHORT
                     ).show()
-                    //binding.rbEstrellas.rating = ratingBar.rating
+
                 }
 
 
@@ -138,8 +145,13 @@ class DetailActivity : AppCompatActivity() {
             .error(R.drawable.read_log_portada)
             .into(binding.ivImagen)
 
+        val progreso = if (librosEntity.paginas > 0) (librosEntity.paginasLeidas * 100) / librosEntity.paginas else 0
+        progressBar.progress = progreso
+        binding.tvTextProgreso.text = "$progreso%"
+
         binding.ivAtras.setOnClickListener { returnToMainActivity()}
         binding.ivEditResena.setOnClickListener { showWriteReviewDialog() }
+        binding.ivEditLibro.setOnClickListener { showEditDialog() }
     }
 
     private fun showWriteReviewDialog() {
@@ -191,6 +203,105 @@ class DetailActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
+    private fun showEditDialog() {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_libro_edit)
+        val btnActualizarLibro: Button = dialog.findViewById(R.id.btnActualizarLibroEdit)
+        val titulo: EditText = dialog.findViewById(R.id.etTituloEdit)
+        val autor: EditText = dialog.findViewById(R.id.etAutorEdit)
+        val editorial: EditText = dialog.findViewById(R.id.etEditorialEdit)
+        val paginas: EditText = dialog.findViewById(R.id.etPaginasEdit)
+        val paginasLeidas: EditText = dialog.findViewById(R.id.etPaginasLeidasEdit)
+        val imagen: EditText = dialog.findViewById(R.id.etImagenEdit)
+        val autoCompleteCategoria = dialog.findViewById<AutoCompleteTextView>(R.id.auto_complete_categoria)
+
+        val items = listOf(
+            "Ficción", "No ficción", "Misterio", "Suspense", "Ciencia ficción", "Fantasía",
+            "Terror", "Romance", "Drama", "Biografía", "Historia", "Autoayuda", "Poesía", "Infantil", "Juvenil"
+        )
+        val adapter2 = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, items)
+        autoCompleteCategoria.setAdapter(adapter2)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val libroExistente = room.getLibroDao().getLibroPorId(id)
+            withContext(Dispatchers.Main) {
+                titulo.setText(libroExistente.titulo)
+                autor.setText(libroExistente.autor)
+                editorial.setText(libroExistente.editorial)
+                paginas.setText(libroExistente.paginas.toString())
+                paginasLeidas.setText(libroExistente.paginasLeidas.toString())
+                imagen.setText(libroExistente.imagen)
+
+                val categoria = room.getCategoriaDao().getCategoriaPorId(libroExistente.id_categoria)
+                autoCompleteCategoria.setText(categoria, false)
+            }
+        }
+
+        autoCompleteCategoria.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val itemSelected = items[position]
+            showToast("Categoría seleccionada: $itemSelected")
+        }
+
+        btnActualizarLibro.setOnClickListener {
+            val currentTitulo = titulo.text.toString()
+            val currentAutor = autor.text.toString()
+            val currentCategoria = autoCompleteCategoria.text.toString()
+            val currentEditorial = editorial.text.toString()
+            val currentPaginaInput = paginas.text.toString()
+            val currentPaginaLeidaInput = paginasLeidas.text.toString()
+            var currentImagen = imagen.text.toString()
+
+            if (currentTitulo.isEmpty() || currentAutor.isEmpty() || currentCategoria.isEmpty() || currentEditorial.isEmpty()) {
+                showToast("Por favor, complete todos los campos requeridos.")
+                return@setOnClickListener
+            }
+
+            val currentPagina = currentPaginaInput.toIntOrNull() ?: run {
+                showToast("El valor de páginas debe ser un número.")
+                return@setOnClickListener
+            }
+
+            val currentPaginaLeida = currentPaginaLeidaInput.toIntOrNull() ?: run {
+                showToast("El valor de páginas leídas debe ser un número.")
+                return@setOnClickListener
+            }
+
+            if (currentImagen.isBlank()) {
+                currentImagen = "https://i.ibb.co/LrnRp03/Read-Log-Portada.png"
+            } else if (!currentImagen.startsWith("https://")) {
+                showToast("La URL de la imagen debe comenzar con 'https://'.")
+                return@setOnClickListener
+            }
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val categoria = room.getCategoriaDao().getCategoriaPorNombre(currentCategoria)
+                if (categoria != null) {
+                    val libro = Libro(currentTitulo, currentAutor, categoria.id_categoria, currentEditorial, currentPagina, currentPaginaLeida, currentImagen)
+                    val libroActualizado = actualizarLibro(libro)
+                    if (libroActualizado != null) {
+                        withContext(Dispatchers.Main) {
+                            createUI(libroActualizado)
+                            showToast("El libro se ha actualizado correctamente")
+                            dialog.dismiss()
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("Categoría no válida")
+                    }
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+
+
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
     @SuppressLint("SuspiciousIndentation")
     private fun getLibro(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -291,6 +402,19 @@ class DetailActivity : AppCompatActivity() {
             }
         }
     }
+
+    private suspend fun actualizarLibro(libro: Libro): LibrosEntity? {
+        return try {
+            room.getLibroDao().actualizarLibro(id, libro.titulo, libro.autor, libro.id_categoria, libro.editorial, libro.paginas, libro.paginasLeidas, libro.imagen)
+            room.getLibroDao().getLibroPorId(id)
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@DetailActivity, "Error al actualizar libro", Toast.LENGTH_SHORT).show()
+            }
+            null
+        }
+    }
+
 
     private fun moverProgressBar(){
         binding.progressBar.progress = contador_progreso
